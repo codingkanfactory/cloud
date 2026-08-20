@@ -29,5 +29,6 @@
 
 ## 👥 Tim & Kredit
 
-- **Lead**: AUQI
-- **Team**: With AI Command
+- **Lead**         : AUQI
+- **Team**         : With AI Command
+- **Distribution** : Github codingkanfactory
