@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud — Cuaca</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="cloud.config.js"></script>
+<link rel="stylesheet" href="cloud.css">
+</head>
+<body class="bg-storm-50 dark:bg-navy-900 text-[#101828] dark:text-[#F1F5F9] font-body transition-colors duration-300">
+
+<div class="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto min-h-screen relative w-full">
+
+  <!-- ============================================================
+       SCREEN 1: SPLASH
+       ============================================================ -->
+  <section id="screen-splash" class="screen active min-h-screen w-full flex-col items-center justify-center bg-storm-500 dark:bg-navy-900" aria-label="Layar pembuka">
+    <div class="breathe">
+      <i data-lucide="cloud" class="w-20 h-20 text-white dark:text-storm-300" fill="currentColor" stroke-width="0"></i>
+    </div>
+    <p class="mt-5 font-display font-semibold tracking-wide text-white/90 dark:text-storm-100 text-lg">Cloud</p>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 2: LOCATION — pencarian kota
+       ============================================================ -->
+  <section id="screen-location" class="screen min-h-screen w-full flex-col items-center justify-center px-6" aria-label="Cari lokasi">
+    <header class="w-full max-w-sm text-center mb-8">
+      <i data-lucide="map-pin" class="w-10 h-10 mx-auto mb-4 text-storm-500 dark:text-storm-300"></i>
+      <h1 class="font-display text-2xl font-semibold">Cari lokasimu</h1>
+      <p class="text-sm text-[#667085] dark:text-[#94A3B8] mt-1">Temukan cuaca di kotamu sekarang</p>
+    </header>
+
+    <main class="w-full max-w-sm">
+      <div class="relative">
+        <button id="btn-manual-search" aria-label="Cari kota" class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center bg-storm-500 dark:bg-storm-600 text-white active:scale-95 transition">
+          <i data-lucide="search" class="w-4 h-4" aria-hidden="true"></i>
+        </button>
+        <label for="input-city" class="sr-only">Cari nama kota</label>
+        <input id="input-city" type="text" placeholder="Cari kota..." class="w-full h-14 pl-14 pr-5 rounded-full bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 outline-none focus:border-storm-500 dark:focus:border-storm-300 text-base placeholder:text-[#98A2B3]">
+      </div>
+      <div id="search-results" role="listbox" class="mt-2 rounded-2xl bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 overflow-hidden hidden"></div>
+
+      <button id="btn-auto-locate" class="mt-4 w-full h-14 rounded-full bg-storm-600 dark:bg-storm-500 text-white font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition">
+        <i data-lucide="locate-fixed" class="w-5 h-5" aria-hidden="true"></i>
+        Gunakan Lokasi Saat Ini
+      </button>
+      <p id="location-status" role="status" class="text-center text-sm text-[#667085] dark:text-[#94A3B8] mt-3 min-h-[20px]"></p>
+    </main>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 3: HOME — ringkasan cuaca
+       ============================================================ -->
+  <section id="screen-home" class="screen min-h-screen w-full flex-col px-5 pt-6 pb-10" aria-label="Ringkasan cuaca">
+
+    <!-- Header: sapaan + kontrol tema/pengaturan -->
+    <header class="flex items-center justify-between gap-3 mb-6">
+      <div class="min-w-0">
+        <p id="greeting-text" class="text-sm text-[#667085] dark:text-[#94A3B8]">Selamat Pagi</p>
+        <p id="home-location" class="font-display text-lg font-semibold flex items-center gap-1 min-w-0">
+          <i data-lucide="map-pin" class="w-4 h-4 text-storm-500 dark:text-storm-300 flex-shrink-0" aria-hidden="true"></i>
+          <span class="truncate-safe">—</span>
+        </p>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button id="btn-theme-toggle" aria-label="Ganti mode gelap/terang" class="w-11 h-11 rounded-full bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 flex items-center justify-center active:scale-95 transition">
+          <i data-lucide="sun-medium" id="icon-theme" class="w-5 h-5 text-storm-600 dark:text-sun" aria-hidden="true"></i>
+        </button>
+        <button id="btn-open-settings" aria-label="Buka pengaturan" class="w-11 h-11 rounded-full bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 flex items-center justify-center active:scale-95 transition">
+          <i data-lucide="settings" class="w-5 h-5 text-storm-600 dark:text-storm-300" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="flex flex-col gap-5">
+      <!-- Kartu cuaca utama: informasi paling penting, ukuran & kontras terbesar -->
+      <section class="rounded-3xl bg-storm-600 dark:bg-navy-800 text-white p-6" aria-label="Cuaca saat ini">
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <p id="main-temp" class="font-display text-6xl font-semibold leading-none">--°</p>
+            <p id="main-condition" class="mt-2 text-white/90 dark:text-storm-100 truncate-safe">Memuat...</p>
+          </div>
+          <i data-lucide="cloud" id="main-icon" class="w-16 h-16 text-white/90 dark:text-storm-200 flex-shrink-0" aria-hidden="true"></i>
+        </div>
+        <div class="grid grid-cols-3 gap-3 mt-6 pt-5 border-t border-white/15 dark:border-navy-700">
+          <div class="text-center min-w-0">
+            <i data-lucide="droplets" class="w-4 h-4 mx-auto mb-1 text-white/70 dark:text-storm-300" aria-hidden="true"></i>
+            <p class="text-xs text-white/70 dark:text-storm-300">Kelembapan</p>
+            <p id="stat-humidity" class="font-semibold text-sm mt-0.5">--%</p>
+          </div>
+          <div class="text-center min-w-0">
+            <i data-lucide="thermometer" class="w-4 h-4 mx-auto mb-1 text-white/70 dark:text-storm-300" aria-hidden="true"></i>
+            <p class="text-xs text-white/70 dark:text-storm-300">Terasa</p>
+            <p id="stat-feelslike" class="font-semibold text-sm mt-0.5">--°</p>
+          </div>
+          <div class="text-center min-w-0">
+            <i data-lucide="wind" class="w-4 h-4 mx-auto mb-1 text-white/70 dark:text-storm-300" aria-hidden="true"></i>
+            <p class="text-xs text-white/70 dark:text-storm-300">Angin</p>
+            <p id="stat-wind" class="font-semibold text-sm mt-0.5">-- km/j</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ramalan 5 hari: dikelompokkan sebagai satu unit (prinsip proximity) -->
+      <section aria-label="Ramalan 5 hari">
+        <h2 class="font-display text-sm font-semibold text-[#667085] dark:text-[#94A3B8] mb-3">Ramalan 5 Hari</h2>
+        <div id="forecast-list" class="flex gap-3 overflow-x-auto no-scrollbar pb-1"></div>
+      </section>
+
+      <!-- Info tambahan: matahari + ringkasan, prioritas visual lebih rendah dari kartu utama -->
+      <section class="grid grid-cols-2 gap-3" aria-label="Informasi tambahan">
+        <div class="rounded-2xl bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 p-4 min-w-0">
+          <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="sunrise" class="w-4 h-4 text-sun flex-shrink-0" aria-hidden="true"></i>
+            <p class="text-xs text-[#667085] dark:text-[#94A3B8]">Terbit</p>
+          </div>
+          <p id="sun-rise" class="font-display font-semibold text-lg">--:--</p>
+          <div class="flex items-center gap-2 mt-3 mb-2">
+            <i data-lucide="sunset" class="w-4 h-4 text-storm-500 flex-shrink-0" aria-hidden="true"></i>
+            <p class="text-xs text-[#667085] dark:text-[#94A3B8]">Terbenam</p>
+          </div>
+          <p id="sun-set" class="font-display font-semibold text-lg">--:--</p>
+        </div>
+        <div class="rounded-2xl bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 p-4 min-w-0">
+          <p class="text-xs text-[#667085] dark:text-[#94A3B8] mb-2">Ringkasan</p>
+          <div class="flex items-center justify-between py-1.5 gap-2">
+            <span class="text-sm text-[#667085] dark:text-[#94A3B8]">Indeks UV</span>
+            <span id="summary-uv" class="font-semibold text-sm">--</span>
+          </div>
+          <div class="flex items-center justify-between py-1.5 gap-2">
+            <span class="text-sm text-[#667085] dark:text-[#94A3B8]">Kelembapan</span>
+            <span id="summary-humidity" class="font-semibold text-sm">--%</span>
+          </div>
+          <div class="flex items-center justify-between py-1.5 gap-2">
+            <span class="text-sm text-[#667085] dark:text-[#94A3B8]">Tertinggi/Terendah</span>
+            <span id="summary-hilo" class="font-semibold text-sm truncate-safe">--° / --°</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 4: SETTINGS
+       ============================================================ -->
+  <section id="screen-settings" class="screen min-h-screen w-full flex-col px-5 pt-6 pb-10" aria-label="Pengaturan">
+    <header class="flex items-center gap-3 mb-6">
+      <button id="btn-back-settings" aria-label="Kembali ke beranda" class="w-10 h-10 rounded-full bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 flex items-center justify-center active:scale-95 transition flex-shrink-0">
+        <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
+      </button>
+      <h1 class="font-display text-xl font-semibold">Pengaturan</h1>
+    </header>
+
+    <main class="flex flex-col gap-5">
+      <section class="rounded-2xl bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 p-5" aria-label="Tentang aplikasi">
+        <p class="text-xs text-[#667085] dark:text-[#94A3B8] mb-3">Tentang Aplikasi</p>
+        <div class="flex items-center justify-between py-2 gap-2">
+          <span class="text-sm">Lead</span>
+          <span class="font-semibold text-sm">AUQI</span>
+        </div>
+        <div class="flex items-center justify-between py-2 gap-2 border-t border-storm-50 dark:border-navy-700">
+          <span class="text-sm">Team</span>
+          <span class="font-semibold text-sm">With AI Command</span>
+        </div>
+      </section>
+
+      <section class="rounded-2xl bg-white dark:bg-navy-800 border border-storm-100 dark:border-navy-700 divide-y divide-storm-50 dark:divide-navy-700" aria-label="Preferensi">
+        <div class="flex items-center justify-between p-5 gap-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium">Lokasi Otomatis</p>
+            <p class="text-xs text-[#667085] dark:text-[#94A3B8] mt-0.5">Sesuaikan lokasi secara otomatis</p>
+          </div>
+          <button id="toggle-autoloc" role="switch" aria-checked="true" aria-label="Toggle lokasi otomatis" class="toggle-track w-12 h-7 rounded-full bg-storm-100 dark:bg-navy-700 relative flex-shrink-0">
+            <span class="toggle-thumb absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow"></span>
+          </button>
+        </div>
+        <div class="flex items-center justify-between p-5 gap-3">
+          <div class="min-w-0">
+            <p class="text-sm font-medium">Mode Gelap</p>
+            <p class="text-xs text-[#667085] dark:text-[#94A3B8] mt-0.5">Ubah tampilan gelap/terang</p>
+          </div>
+          <button id="toggle-dark" role="switch" aria-checked="false" aria-label="Toggle mode gelap" class="toggle-track w-12 h-7 rounded-full bg-storm-100 dark:bg-navy-700 relative flex-shrink-0">
+            <span class="toggle-thumb absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow"></span>
+          </button>
+        </div>
+        <div class="p-5">
+          <p class="text-sm font-medium mb-3">Satuan Suhu</p>
+          <div class="grid grid-cols-2 gap-2 bg-storm-50 dark:bg-navy-900 rounded-full p-1">
+            <button id="unit-c" class="h-10 rounded-full text-sm font-semibold transition">Celsius</button>
+            <button id="unit-f" class="h-10 rounded-full text-sm font-semibold transition">Fahrenheit</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+</div>
+
+<script src="cloud.js"></script>
+</body>
+</html>
